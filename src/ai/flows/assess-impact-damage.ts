@@ -33,6 +33,24 @@ const AssessImpactDamageOutputSchema = z.object({
     .describe(
       'A summary of the estimated damage within the specified radius of the impact zone, based on AI analysis of GIS and geological data.'
     ),
+  funFact: z
+    .string()
+    .describe(
+      'An interesting and educational fact that contextualizes the impact\'s scale, like comparing it to a famous landmark or a historical event.'
+    ),
+  craterDiameterKm: z
+    .number()
+    .describe('The estimated diameter of the impact crater in kilometers.'),
+  riskLevel: z
+    .enum(['Low', 'Moderate', 'High', 'Catastrophic'])
+    .describe(
+      'A classification of the risk level based on the potential for destruction.'
+    ),
+  icon: z
+    .enum(['Mountain', 'Building2', 'Landmark', 'Bomb'])
+    .describe(
+      'An icon name representing the scale of the impact. Options: Mountain, Building2, Landmark, Bomb.'
+    ),
 });
 export type AssessImpactDamageOutput = z.infer<typeof AssessImpactDamageOutputSchema>;
 
@@ -47,10 +65,14 @@ const assessImpactDamagePrompt = ai.definePrompt({
   prompt: `You are an expert in assessing the damage caused by meteorite impacts.
 
   Given the location of the impact (latitude: {{latitude}}, longitude: {{longitude}}), the size of the meteorite ({{meteoriteSizeInKilograms}} kilograms), and the radius around the impact zone to assess ({{radiusInKilometers}} kilometers),
-  provide a summary of the estimated damage, considering GIS and geological data.
-  Consider population density, infrastructure, and environmental factors in your assessment.
-  Include potential effects such as seismic activity, air blast damage, thermal radiation, and crater formation.
-  Format your response as a concise paragraph.
+  provide a detailed damage assessment.
+
+  Your response must include:
+  1.  A summary of the estimated damage, considering population density, infrastructure, and environmental factors. Include potential effects like seismic activity, air blast, and thermal radiation.
+  2.  An estimated crater diameter in kilometers.
+  3.  A "fun fact" to contextualize the scale. Be creative and educational. Examples: "The energy released is equivalent to X atomic bombs." or "A crater this size could fit the entire city of Y inside." or "If this crater were a mountain, it would be the Nth tallest in the world."
+  4.  A risk level: 'Low', 'Moderate', 'High', or 'Catastrophic'.
+  5.  An icon that best represents the scale of the event: 'Mountain' for huge geological impact, 'Building2' for city-level damage, 'Landmark' for a significant but localized event, or 'Bomb' for immense energy release.
   `,
 });
 
