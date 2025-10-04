@@ -90,6 +90,10 @@ export default {
           '0%': { opacity: '0', transform: 'scale(0.8)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        'fade-in-up': {
+          'from': { opacity: '0', transform: 'translateY(20px)' },
+          'to': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -97,6 +101,7 @@ export default {
         'impact-flash': 'impact-flash 0.5s ease-out forwards',
         'shockwave': 'shockwave 1s ease-out 0.2s forwards',
         'crater-appear': 'crater-appear 0.5s ease-in 0.6s forwards',
+        'fade-in-up': 'fade-in-up 1s ease-out forwards',
       },
     },
   },
