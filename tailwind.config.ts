@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -55,16 +55,6 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
-        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -88,10 +78,25 @@ export default {
             height: '0',
           },
         },
+        'impact-flash': {
+          '0%': { opacity: '1', transform: 'scale(0.1)' },
+          '100%': { opacity: '0', transform: 'scale(1.5)' },
+        },
+        'shockwave': {
+          '0%': { transform: 'scale(0)', opacity: '0.7', 'border-width': '8px' },
+          '100%': { transform: 'scale(1)', opacity: '0', 'border-width': '0px' },
+        },
+        'crater-appear': {
+          '0%': { opacity: '0', transform: 'scale(0.8)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'impact-flash': 'impact-flash 0.5s ease-out forwards',
+        'shockwave': 'shockwave 1s ease-out 0.2s forwards',
+        'crater-appear': 'crater-appear 0.5s ease-in 0.6s forwards',
       },
     },
   },

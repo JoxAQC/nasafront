@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "world-map",
+      "description": "A flat map of the world.",
+      "imageUrl": "https://images.unsplash.com/photo-1709382803049-7e08fb6275da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx3b3JsZCUyMG1hcCUyMHNhdGVsbGl0ZXxlbnwwfHx8fDE3NTk1OTQ4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "world map satellite"
+    }
+  ]
 }
