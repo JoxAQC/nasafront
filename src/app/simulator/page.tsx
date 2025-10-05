@@ -20,8 +20,6 @@ import { Separator } from '@/components/ui/separator';
 export type Coordinates = {
   lat: number;
   lng: number;
-  x: number;
-  y: number;
 };
 
 export type SimulationOutput = {
@@ -43,11 +41,13 @@ export default function SimulatorPage() {
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showImpact, setShowImpact] = useState(false);
+  const [impactPixel, setImpactPixel] = useState<{x: number, y: number} | null>(null);
   const { toast } = useToast();
 
-  const handleLocationSelect = (coords: Coordinates) => {
+  const handleLocationSelect = (coords: Coordinates, pixel?: {x: number, y: number}) => {
     if (isBusy) return;
     setImpactLocation(coords);
+    if(pixel) setImpactPixel(pixel);
     setReport(null);
     setError(null);
   };
@@ -104,7 +104,10 @@ export default function SimulatorPage() {
     }
 
     setIsBusy(false);
-    setTimeout(() => setShowImpact(false), 2000);
+    setTimeout(() => {
+      setShowImpact(false);
+      setImpactPixel(null);
+    }, 2000);
   };
   
   const handleReset = () => {
@@ -113,6 +116,7 @@ export default function SimulatorPage() {
     setError(null);
     setIsBusy(false);
     setShowImpact(false);
+    setImpactPixel(null);
   };
 
   return (
@@ -135,10 +139,10 @@ export default function SimulatorPage() {
         {report && !isBusy && <div className="animate-fade-in-up"><DamageReport report={report} /></div>}
       </div>
       <div className="relative h-full w-full">
-        <MapView onLocationSelect={handleLocationSelect} selectedLocation={impactLocation} isBusy={isBusy} />
-        {showImpact && impactLocation && <ImpactAnimation x={impactLocation.x} y={impactLocation.y} />}
+        <MapView onLocationSelect={handleLocationSelect} selectedLocation={impactLocation} />
+        {showImpact && impactPixel && <ImpactAnimation x={impactPixel.x} y={impactPixel.y} />}
          {!impactLocation && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/50">
             <div className="max-w-md rounded-lg bg-background/80 p-8 text-center text-foreground shadow-lg backdrop-blur-sm">
               <h2 className="text-2xl font-bold">Select Impact Location</h2>
               <p className="mt-2 text-muted-foreground">

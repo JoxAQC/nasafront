@@ -1,59 +1,112 @@
 'use client';
 
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useRef } from 'react';
-import { MapPin } from 'lucide-react';
-import type { Coordinates } from '@/app/page';
+import { useState, useCallback, useMemo } from 'react';
+import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
+import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
+import type { Coordinates } from '@/app/simulator/page';
 
 type MapViewProps = {
-  onLocationSelect: (coords: Coordinates) => void;
+  onLocationSelect: (coords: Coordinates, pixel: {x: number, y: number}) => void;
   selectedLocation: Coordinates | null;
-  isBusy: boolean;
 };
 
-export function MapView({ onLocationSelect, selectedLocation, isBusy }: MapViewProps) {
-  const mapImage = PlaceHolderImages.find((p) => p.id === 'world-map');
-  const mapRef = useRef<HTMLDivElement>(null);
+const containerStyle = {
+  width: '100%',
+  height: '100%',
+};
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isBusy || !mapRef.current) return;
-    const rect = mapRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+const center = {
+  lat: 20,
+  lng: 0,
+};
 
-    const lat = 90 - (y / rect.height) * 180;
-    const lng = (x / rect.width) * 360 - 180;
+const mapOptions = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  mapTypeId: 'satellite',
+  styles: [
+    {
+      featureType: 'all',
+      elementType: 'labels',
+      stylers: [{ visibility: 'off' }],
+    },
+  ],
+};
 
-    onLocationSelect({ lat, lng, x, y });
-  };
+
+export function MapView({ onLocationSelect, selectedLocation }: MapViewProps) {
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['geometry', 'drawing'],
+  });
+
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
+    setMap(mapInstance);
+  }, []);
+
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  const handleClick = useCallback((e: google.maps.MapMouseEvent) => {
+      if (e.latLng && map) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        
+        // This is a bit of a hack to get pixel coordinates for the animation
+        // It's not perfectly accurate but good enough for a visual effect.
+        const overlay = new google.maps.OverlayView();
+        overlay.setMap(map);
+        overlay.draw = function() {};
+        const projection = overlay.getProjection();
+        
+        if (projection) {
+            const pixel = projection.fromLatLngToContainerPixel(e.latLng);
+            if (pixel) {
+                onLocationSelect({ lat, lng }, pixel);
+            }
+        }
+      }
+    },[map, onLocationSelect]);
+
+
+  if (loadError) {
+    return <div className="flex items-center justify-center w-full h-full bg-destructive/10 text-destructive-foreground">Error loading map</div>;
+  }
+
+  if (!isLoaded) {
+    return <Skeleton className="w-full h-full" />;
+  }
 
   return (
-    <div
-      ref={mapRef}
-      className={cn("relative w-full h-full", isBusy ? "cursor-wait" : "cursor-crosshair")}
-      onClick={handleClick}
-    >
-      {mapImage && (
-        <Image
-          src={mapImage.imageUrl}
-          alt={mapImage.description}
-          data-ai-hint={mapImage.imageHint}
-          fill
-          className="object-cover"
-          priority
-        />
-      )}
-      <div className="absolute inset-0 bg-black/20" />
-      {selectedLocation && (
-        <div
-          className="absolute transform -translate-x-1/2 -translate-y-full transition-all duration-300 ease-out"
-          style={{ left: `${selectedLocation.x}px`, top: `${selectedLocation.y}px` }}
-        >
-          <MapPin className="w-10 h-10 text-primary drop-shadow-lg" fill="currentColor" strokeWidth={1.5} />
-        </div>
-      )}
+    <div className="relative w-full h-full cursor-crosshair">
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        zoom={2}
+        options={mapOptions}
+        onLoad={onMapLoad}
+        onUnmount={onUnmount}
+        onClick={handleClick}
+      >
+        {selectedLocation && (
+          <MarkerF
+            position={selectedLocation}
+            icon={{
+              path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
+              fillColor: 'hsl(var(--primary))',
+              fillOpacity: 1,
+              strokeWeight: 1.5,
+              strokeColor: 'white',
+              anchor: new google.maps.Point(12, 24),
+              scale: 1.8,
+            }}
+          />
+        )}
+      </GoogleMap>
     </div>
   );
 }
