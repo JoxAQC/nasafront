@@ -37,12 +37,18 @@ export function calculateImpactMetrics(H: number) {
   // Esta es una aproximación muy simplificada de esas complejas fórmulas
   const D_crater_km = 1.8 * D_km;
 
+  // Magnitud sísmica estimada (Richter) a partir de la energía en Joules
+  // Fórmula: M = (2/3)log10(E) - 3.2
+  const M_richter = (2 / 3) * Math.log10(Ek_joules) - 3.2;
+
+
   return {
     D_diameter_m: D_m.toFixed(2),
     M_mass_kg: mass.toExponential(2),
     Ek_megatons: Ek_megatons.toFixed(2),
     R_blast_km: R_blast_km.toFixed(2),
-    D_crater_km: D_crater_km.toFixed(3)
+    D_crater_km: D_crater_km.toFixed(3),
+    M_richter: M_richter.toFixed(2),
   };
 }
 

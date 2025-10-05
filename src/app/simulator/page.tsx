@@ -28,6 +28,7 @@ export type SimulationOutput = {
   Ek_megatons: string;
   R_blast_km: string;
   D_crater_km: string;
+  M_richter: string;
 }
 
 export type Report = AssessImpactDamageOutput & {

@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import {
   Mountain, Building2, Landmark, Bomb, Diameter, Scale, Sparkles, AlertTriangle,
-  Weight, Telescope, Atom, Sigma, Info, ShieldCheck
+  Weight, Telescope, Atom, Sigma, Info, ShieldCheck, Waves
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from './ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -58,6 +58,12 @@ export function DamageReport({ report }: { report: Report }) {
       tooltip: { title: "Kinetic Energy Released", text: "One megaton (MT) is the energy of one million tons of TNT. For context, the Tunguska event was ~15 MT and the Tsar Bomba, the most powerful nuclear weapon ever detonated, had a yield of ~50 MT." }
     },
     {
+      icon: Waves,
+      label: "Est. Seismic Magnitude",
+      value: `${report.simulation.M_richter} Richter`,
+      tooltip: { title: "Estimated Seismic Magnitude", text: "An estimation of the equivalent earthquake magnitude on the Richter scale based on the impact's kinetic energy. This is a simplified model." }
+    },
+    {
       icon: AlertTriangle,
       label: "Blast Radius",
       value: `${report.simulation.R_blast_km} km`,
@@ -66,7 +72,7 @@ export function DamageReport({ report }: { report: Report }) {
      {
       icon: Diameter,
       label: "Crater Diameter",
-      value: `${report.simulation.D_crater_km} km`,
+      value: `${(parseFloat(report.simulation.D_crater_km) * 1000).toLocaleString('en-US', { maximumFractionDigits: 0 })} m`,
       tooltip: { title: "Simple Crater Diameter", text: "An estimation of the final crater's diameter based on a simplified scaling law. The AI provides a more nuanced estimate based on other factors." }
     },
   ];
