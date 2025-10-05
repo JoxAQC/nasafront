@@ -3,13 +3,16 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getImpactAssessment } from '@/app/actions';
-import { ImpactForm } from '@/components/impact-form';
+import { ImpactForm, type ImpactFormData } from '@/components/impact-form';
 import { DamageReport } from '@/components/damage-report';
 import { ImpactAnimation } from '@/components/impact-animation';
 import { MapView } from '@/components/map-view';
 import { AssessImpactDamageOutput } from '@/ai/flows/assess-impact-damage';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
+import { asteroids, type Asteroid } from '@/lib/asteroid-data';
+import { calculateImpactMetrics } from '@/lib/impact-calculator';
+
 
 export type Coordinates = {
   lat: number;
@@ -18,7 +21,18 @@ export type Coordinates = {
   y: number;
 };
 
-export type Report = AssessImpactDamageOutput;
+export type SimulationOutput = {
+  D_diameter_m: string;
+  M_mass_kg: string;
+  Ek_megatons: string;
+  R_blast_km: string;
+  D_crater_km: string;
+}
+
+export type Report = AssessImpactDamageOutput & {
+  simulation: SimulationOutput;
+  asteroid: Asteroid;
+};
 
 export default function SimulatorPage() {
   const [report, setReport] = useState<Report | null>(null);
@@ -35,7 +49,7 @@ export default function SimulatorPage() {
     setError(null);
   };
 
-  const handleSimulate = async (data: { meteoriteSize: number; radius: number }) => {
+  const handleSimulate = async (data: ImpactFormData) => {
     if (!impactLocation) {
       toast({
         variant: 'destructive',
@@ -44,23 +58,39 @@ export default function SimulatorPage() {
       });
       return;
     }
+    
+    const selectedAsteroid = asteroids.find(a => a.full_name === data.asteroidName);
+    if (!selectedAsteroid) {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid Asteroid',
+            description: 'Please select a valid asteroid from the list.',
+        });
+        return;
+    }
 
     setIsBusy(true);
     setError(null);
     setReport(null);
     setShowImpact(true);
 
+    const simulationResults = calculateImpactMetrics(selectedAsteroid.H);
+    
     const input = {
       latitude: impactLocation.lat,
       longitude: impactLocation.lng,
-      meteoriteSizeInKilograms: data.meteoriteSize * 1000,
-      radiusInKilometers: data.radius,
+      meteoriteSizeInKilograms: parseFloat(simulationResults.M_mass_kg),
+      radiusInKilometers: parseFloat(simulationResults.R_blast_km),
     };
 
     const result = await getImpactAssessment(input);
 
     if (result.success && result.data) {
-      setReport(result.data);
+      setReport({ 
+        ...result.data,
+        simulation: simulationResults,
+        asteroid: selectedAsteroid
+      });
     } else {
       setError(result.error || 'An unknown error occurred.');
       toast({

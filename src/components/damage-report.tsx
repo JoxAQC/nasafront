@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Report } from '@/app/page';
+import type { Report } from '@/app/simulator/page';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { Mountain, Building2, Landmark, Bomb, Diameter, Scale, Sparkles } from 'lucide-react';
+import { Mountain, Building2, Landmark, Bomb, Diameter, Scale, Sparkles, AlertTriangle, Weight, Telescope, Atom, Sigma } from 'lucide-react';
+import { Table, TableBody, TableCell, TableRow } from './ui/table';
 
 const riskLevelStyles: { [key: string]: string } = {
   Low: 'bg-green-500/20 text-green-300 border-green-500/30',
@@ -21,11 +22,44 @@ const iconMap: { [key: string]: React.ElementType } = {
 export function DamageReport({ report }: { report: Report }) {
   const IconComponent = iconMap[report.icon] || Scale;
 
+  const simulationData = [
+    {
+      icon: Telescope,
+      label: "Asteroid Name",
+      value: report.asteroid.full_name.trim(),
+    },
+    {
+      icon: Sigma,
+      label: "Absolute Magnitude (H)",
+      value: report.asteroid.H.toString(),
+    },
+    {
+      icon: Diameter,
+      label: "Est. Diameter",
+      value: `${report.simulation.D_diameter_m} m`,
+    },
+    {
+      icon: Weight,
+      label: "Est. Mass",
+      value: `${report.simulation.M_mass_kg} kg`,
+    },
+    {
+      icon: Atom,
+      label: "Impact Energy",
+      value: `${report.simulation.Ek_megatons} MT`,
+    },
+    {
+      icon: AlertTriangle,
+      label: "Blast Radius",
+      value: `${report.simulation.R_blast_km} km`,
+    },
+  ];
+
   return (
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
         <CardTitle>Damage Assessment</CardTitle>
-        <CardDescription>AI-Generated Impact Analysis</CardDescription>
+        <CardDescription>AI-Generated Analysis & Impact Simulation</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center p-4 bg-muted/30 rounded-lg">
@@ -44,11 +78,30 @@ export function DamageReport({ report }: { report: Report }) {
         
         <Separator />
 
+        <div>
+            <h4 className="font-semibold mb-2 text-base">Simulation Results</h4>
+            <Table>
+                <TableBody>
+                    {simulationData.map(item => (
+                        <TableRow key={item.label}>
+                            <TableCell className="font-medium flex items-center gap-2 p-2">
+                                <item.icon className="w-4 h-4 text-primary shrink-0" />
+                                {item.label}
+                            </TableCell>
+                            <TableCell className="text-right p-2 text-muted-foreground">{item.value}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+
+        <Separator />
+        
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div className="flex items-start gap-3">
             <Diameter className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold">Crater Diameter</h4>
+              <h4 className="font-semibold">AI Est. Crater Diameter</h4>
               <p className="text-muted-foreground">{report.craterDiameterKm.toLocaleString()} km</p>
             </div>
           </div>

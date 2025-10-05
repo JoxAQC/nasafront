@@ -6,33 +6,46 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import type { Coordinates } from '@/app/page';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Coordinates } from '@/app/simulator/page';
 import { Rocket, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { asteroids } from '@/lib/asteroid-data';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
-  meteoriteSize: z.number().min(1).max(1000),
-  radius: z.number().min(1).max(500),
+  asteroidName: z.string().min(1, 'Please select an asteroid.'),
+  latitude: z.number(),
+  longitude: z.number(),
 });
 
+export type ImpactFormData = z.infer<typeof formSchema>;
+
 type ImpactFormProps = {
-  onSimulate: (data: z.infer<typeof formSchema>) => void;
+  onSimulate: (data: ImpactFormData) => void;
   onReset: () => void;
   isBusy: boolean;
   impactLocation: Coordinates | null;
 };
 
 export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: ImpactFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ImpactFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      meteoriteSize: 50,
-      radius: 100,
+      asteroidName: '',
+      latitude: NaN,
+      longitude: NaN,
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  useEffect(() => {
+    if (impactLocation) {
+      form.setValue('latitude', impactLocation.lat);
+      form.setValue('longitude', impactLocation.lng);
+    }
+  }, [impactLocation, form]);
+
+  const onSubmit = (data: ImpactFormData) => {
     onSimulate(data);
   };
 
@@ -44,75 +57,73 @@ export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: Impa
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="meteoriteSize"
+                name="asteroidName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Meteorite Size (kilotons)</FormLabel>
-                    <div className="flex items-center gap-4">
+                    <FormLabel>Select Asteroid</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isBusy}>
                       <FormControl>
-                        <Slider
-                          min={1}
-                          max={1000}
-                          step={1}
-                          value={[field.value]}
-                          onValueChange={(value) => field.onChange(value[0])}
-                          disabled={isBusy}
-                        />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a Near-Earth Object..." />
+                        </SelectTrigger>
                       </FormControl>
-                      <Input
-                        type="number"
-                        className="w-24"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                        disabled={isBusy}
-                      />
-                    </div>
+                      <SelectContent>
+                        {asteroids.map((asteroid) => (
+                          <SelectItem key={asteroid.full_name} value={asteroid.full_name}>
+                            {asteroid.full_name.trim()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="radius"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assessment Radius (km)</FormLabel>
-                    <div className="flex items-center gap-4">
-                      <FormControl>
-                        <Slider
-                          min={1}
-                          max={500}
-                          step={1}
-                          value={[field.value]}
-                          onValueChange={(value) => field.onChange(value[0])}
-                          disabled={isBusy}
-                        />
-                      </FormControl>
-                      <Input
-                        type="number"
-                        className="w-24"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                        disabled={isBusy}
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
               <div className="grid grid-cols-2 gap-4">
-                  <FormItem>
-                    <FormLabel>Latitude</FormLabel>
-                    <Input value={impactLocation ? impactLocation.lat.toFixed(4) : 'N/A'} readOnly disabled />
-                  </FormItem>
-                  <FormItem>
-                    <FormLabel>Longitude</FormLabel>
-                    <Input value={impactLocation ? impactLocation.lng.toFixed(4) : 'N/A'} readOnly disabled />
-                  </FormItem>
+                <FormField
+                  control={form.control}
+                  name="latitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Latitude</FormLabel>
+                      <FormControl>
+                         <Input 
+                            {...field} 
+                            value={field.value || ''}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            type="number"
+                            disabled={isBusy} 
+                            placeholder="Select on map"
+                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="longitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Longitude</FormLabel>
+                      <FormControl>
+                         <Input 
+                            {...field} 
+                            value={field.value || ''}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            type="number"
+                            disabled={isBusy} 
+                            placeholder="Select on map"
+                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </div>
+
               <div className="flex gap-2">
                 <Button type="submit" disabled={isBusy || !impactLocation} className="flex-1">
                   <Rocket />
