@@ -29,11 +29,13 @@ export function calculateImpactMetrics(H: number) {
   const Ek_joules = 0.5 * mass * Math.pow(V_IMPACT_ASSUMED, 2);
   const Ek_megatons = Ek_joules / JOULES_TO_MEGATONS;
 
-  // Radio de destrucción (km)
+  // Radio de destrucción (km) - Collins et al. 2005 (para sobrepresión de 5 psi)
   const R_blast_km = 1.5 * Math.cbrt(Ek_megatons);
 
-  // Diámetro del cráter (km)
-  const D_crater_km = 15 * D_km;
+  // Diámetro del cráter simple (km) - Holsapple & Schmidt 1987
+  // D = 1.8 * (rho_p / rho_t)^(1/3) * g^(-0.22) * L^(0.13) * E_k^(0.22)
+  // Esta es una aproximación muy simplificada de esas complejas fórmulas
+  const D_crater_km = 1.8 * D_km;
 
   return {
     D_diameter_m: D_m.toFixed(2),

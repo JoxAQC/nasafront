@@ -2,8 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { Report } from '@/app/simulator/page';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { Mountain, Building2, Landmark, Bomb, Diameter, Scale, Sparkles, AlertTriangle, Weight, Telescope, Atom, Sigma } from 'lucide-react';
+import {
+  Mountain, Building2, Landmark, Bomb, Diameter, Scale, Sparkles, AlertTriangle,
+  Weight, Telescope, Atom, Sigma, Info, ShieldCheck
+} from 'lucide-react';
 import { Table, TableBody, TableCell, TableRow } from './ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const riskLevelStyles: { [key: string]: string } = {
   Low: 'bg-green-500/20 text-green-300 border-green-500/30',
@@ -19,6 +23,20 @@ const iconMap: { [key: string]: React.ElementType } = {
   Bomb: Bomb,
 };
 
+const TooltipContentWrapper = ({ title, text, children }: { title: string; text: string; children: React.ReactNode }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            {children}
+        </TooltipTrigger>
+        <TooltipContent>
+            <div className="max-w-xs text-center">
+                <p className="font-bold text-base">{title}</p>
+                <p className="text-sm text-muted-foreground">{text}</p>
+            </div>
+        </TooltipContent>
+    </Tooltip>
+);
+
 export function DamageReport({ report }: { report: Report }) {
   const IconComponent = iconMap[report.icon] || Scale;
 
@@ -27,31 +45,43 @@ export function DamageReport({ report }: { report: Report }) {
       icon: Telescope,
       label: "Asteroid Name",
       value: report.asteroid.full_name.trim(),
+      tooltip: { title: "Near-Earth Object (NEO)", text: "The official designation for the selected asteroid." }
     },
     {
       icon: Sigma,
       label: "Absolute Magnitude (H)",
       value: report.asteroid.H.toString(),
+      tooltip: { title: "Absolute Magnitude (H)", text: "A measure of a celestial object's intrinsic brightness. Lower values mean a brighter (and generally larger) object." }
     },
     {
       icon: Diameter,
       label: "Est. Diameter",
       value: `${report.simulation.D_diameter_m} m`,
+      tooltip: { title: "Estimated Diameter", text: "The approximate diameter of the asteroid, calculated from its absolute magnitude (H) and an assumed albedo (reflectivity)." }
     },
     {
       icon: Weight,
       label: "Est. Mass",
       value: `${report.simulation.M_mass_kg} kg`,
+      tooltip: { title: "Estimated Mass", text: "Calculated from the estimated diameter and an assumed density for a siliceous (stony) asteroid." }
     },
     {
       icon: Atom,
       label: "Impact Energy",
       value: `${report.simulation.Ek_megatons} MT`,
+      tooltip: { title: "Kinetic Energy Released", text: "One megaton (MT) is the energy of one million tons of TNT. For context, the Tsar Bomba, the most powerful nuclear weapon ever detonated, had a yield of ~50 MT. The Tunguska event was ~15 MT." }
     },
     {
       icon: AlertTriangle,
       label: "Blast Radius",
       value: `${report.simulation.R_blast_km} km`,
+      tooltip: { title: "Estimated Blast Radius", text: "The approximate radius of significant destruction from the air blast. This is a simplified estimation." }
+    },
+     {
+      icon: Diameter,
+      label: "Crater Diameter",
+      value: `${report.simulation.D_crater_km} km`,
+      tooltip: { title: "Simple Crater Diameter", text: "An estimation of the final crater's diameter based on a simplified scaling law. The AI provides a more nuanced estimate based on other factors." }
     },
   ];
 
@@ -72,25 +102,33 @@ export function DamageReport({ report }: { report: Report }) {
           </Badge>
         </div>
         
-        <div>
-            <h4 className="font-semibold mb-2 text-base">Simulation Results</h4>
-            <Table>
-                <TableBody>
-                    {simulationData.map(item => (
-                        <TableRow key={item.label}>
-                            <TableCell className="font-medium flex items-center gap-2 p-2">
-                                <item.icon className="w-4 h-4 text-primary shrink-0" />
-                                {item.label}
-                            </TableCell>
-                            <TableCell className="text-right p-2 text-muted-foreground">{item.value}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
+        <TooltipProvider>
+            <div>
+                <h4 className="font-semibold mb-2 text-base">Simulation Results</h4>
+                <Table>
+                    <TableBody>
+                        {simulationData.map(item => (
+                            <TableRow key={item.label}>
+                                <TableCell className="font-medium flex items-center gap-2 p-2">
+                                    <item.icon className="w-4 h-4 text-primary shrink-0" />
+                                    <span>{item.label}</span>
+                                     <TooltipContentWrapper title={item.tooltip.title} text={item.tooltip.text}>
+                                        <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                                    </TooltipContentWrapper>
+                                </TableCell>
+                                <TableCell className="text-right p-2 text-muted-foreground">{item.value}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <p className="text-xs text-muted-foreground mt-2 px-1">
+                    *Estimates are approximate, based on a simplified model.
+                </p>
+            </div>
+        </TooltipProvider>
 
         <Separator />
-
+        
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div className="flex items-start gap-3">
             <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -115,6 +153,20 @@ export function DamageReport({ report }: { report: Report }) {
           <div className="text-sm text-foreground/90 space-y-4">
             <p>{report.summary}</p>
           </div>
+        </div>
+
+        <Separator />
+
+         <div>
+          <h4 className="font-semibold mb-2 text-base">Mitigation Strategies</h4>
+           <ul className="space-y-3 text-sm text-foreground/90 pl-1">
+            {report.mitigationStrategies.map((strategy, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span>{strategy}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
       </CardContent>

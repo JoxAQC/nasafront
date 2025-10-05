@@ -31,7 +31,7 @@ const AssessImpactDamageOutputSchema = z.object({
   summary: z
     .string()
     .describe(
-      'A summary of the estimated damage within the specified radius of the impact zone, based on AI analysis of GIS and geological data.'
+      'A summary of the estimated damage. Use conditional language like "could generate..." for catastrophic claims (e.g., seismic events) unless backed by geophysical models, stating that detailed modeling is needed for precise magnitudes.'
     ),
   funFact: z
     .string()
@@ -51,6 +51,11 @@ const AssessImpactDamageOutputSchema = z.object({
     .describe(
       'An icon name representing the scale of the impact. Options: Mountain, Building2, Landmark, Bomb.'
     ),
+    mitigationStrategies: z
+    .array(z.string())
+    .describe(
+      'A list of actionable impact mitigation strategies for the general population.'
+    ),
 });
 export type AssessImpactDamageOutput = z.infer<typeof AssessImpactDamageOutputSchema>;
 
@@ -62,21 +67,25 @@ const assessImpactDamagePrompt = ai.definePrompt({
   name: 'assessImpactDamagePrompt',
   input: {schema: AssessImpactDamageInputSchema},
   output: {schema: AssessImpactDamageOutputSchema},
-  prompt: `You are an expert in assessing the damage caused by meteorite impacts.
+  prompt: `You are an expert in assessing the damage caused by meteorite impacts. Your tone must be scientific and cautious.
 
   Given the location of the impact (latitude: {{latitude}}, longitude: {{longitude}}), the size of the meteorite ({{meteoriteSizeInKilograms}} kilograms), and the radius around the impact zone to assess ({{radiusInKilometers}} kilometers),
   provide a detailed damage assessment.
 
+  CRITICAL GUIDELINES:
+  - DO NOT invent specific, catastrophic numbers for effects like seismic magnitudes (e.g., "magnitude 11 earthquake"). Instead, use cautious, conditional language. For example: "The impact could generate significant seismic waves, but detailed geophysical modeling would be required to estimate a precise magnitude."
+  - Frame your summary in terms of potential effects and risks, not certainties.
+
   Your response must include:
   1.  A "fun fact" to contextualize the scale of the impact. This fact MUST be a relatable analogy. Be creative and educational.
-      - For energy, compare it to something understandable, like "The energy released is equivalent to X atomic bombs."
-      - For crater size, compare it to a landmark, like "A crater this size could fit the entire city of Y inside." or "If this crater were a mountain, it would be the Nth tallest in the world."
-      - For blast radius, compare it to a known geographical area.
+      - For energy, compare it to something understandable, like "The energy released is equivalent to X Tsar Bomba explosions."
+      - For crater size, compare it to a landmark, like "A crater this size could fit the entire city of Y inside."
       Pick the most impactful and easily understood analogy.
-  2.  A summary of the estimated damage, considering population density, infrastructure, and environmental factors. Include potential effects like seismic activity, air blast, and thermal radiation.
+  2.  A summary of the estimated damage. Follow the critical guidelines above. Mention potential effects like seismic activity, air blast, and thermal radiation in a qualitative or conditional manner.
   3.  An estimated crater diameter in kilometers.
   4.  A risk level: 'Low', 'Moderate', 'High', or 'Catastrophic'.
   5.  An icon that best represents the scale of the event: 'Mountain' for huge geological impact, 'Building2' for city-level damage, 'Landmark' for a significant but localized event, or 'Bomb' for immense energy release.
+  6.  A list of 3-4 actionable mitigation strategies for the general population to consider in such an event (e.g., shelter-in-place, evacuation routes, emergency kits).
   `,
 });
 
