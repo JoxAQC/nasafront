@@ -58,8 +58,8 @@ export function DamageReport({ report }: { report: Report }) {
   return (
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Damage Assessment</CardTitle>
-        <CardDescription>AI-Generated Analysis & Impact Simulation</CardDescription>
+        <CardTitle>Impact Report</CardTitle>
+        <CardDescription>Simulation &amp; AI-Generated Analysis</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center p-4 bg-muted/30 rounded-lg">
@@ -71,13 +71,7 @@ export function DamageReport({ report }: { report: Report }) {
             {report.riskLevel} Risk
           </Badge>
         </div>
-
-        <div className="text-sm text-foreground/90 space-y-4">
-          <p>{report.summary}</p>
-        </div>
         
-        <Separator />
-
         <div>
             <h4 className="font-semibold mb-2 text-base">Simulation Results</h4>
             <Table>
@@ -96,23 +90,33 @@ export function DamageReport({ report }: { report: Report }) {
         </div>
 
         <Separator />
-        
+
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div className="flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-semibold">Contextual Fact</h4>
+              <p className="text-muted-foreground">{report.funFact}</p>
+            </div>
+          </div>
+           <div className="flex items-start gap-3">
             <Diameter className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold">AI Est. Crater Diameter</h4>
               <p className="text-muted-foreground">{report.craterDiameterKm.toLocaleString()} km</p>
             </div>
           </div>
-          <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-semibold">Curious Fact</h4>
-              <p className="text-muted-foreground">{report.funFact}</p>
-            </div>
+        </div>
+        
+        <Separator />
+
+        <div>
+          <h4 className="font-semibold mb-2 text-base">Damage Assessment</h4>
+          <div className="text-sm text-foreground/90 space-y-4">
+            <p>{report.summary}</p>
           </div>
         </div>
+
       </CardContent>
     </Card>
   );

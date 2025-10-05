@@ -36,7 +36,7 @@ const AssessImpactDamageOutputSchema = z.object({
   funFact: z
     .string()
     .describe(
-      'An interesting and educational fact that contextualizes the impact\'s scale, like comparing it to a famous landmark or a historical event.'
+      'An interesting and educational fact that contextualizes the impact\'s scale. It must provide a relatable comparison for the impact energy (e.g., "equivalent to X atomic bombs"), the crater diameter (e.g., "could fit the entire city of Y inside"), or the blast radius.'
     ),
   craterDiameterKm: z
     .number()
@@ -68,9 +68,13 @@ const assessImpactDamagePrompt = ai.definePrompt({
   provide a detailed damage assessment.
 
   Your response must include:
-  1.  A summary of the estimated damage, considering population density, infrastructure, and environmental factors. Include potential effects like seismic activity, air blast, and thermal radiation.
-  2.  An estimated crater diameter in kilometers.
-  3.  A "fun fact" to contextualize the scale. Be creative and educational. Examples: "The energy released is equivalent to X atomic bombs." or "A crater this size could fit the entire city of Y inside." or "If this crater were a mountain, it would be the Nth tallest in the world."
+  1.  A "fun fact" to contextualize the scale of the impact. This fact MUST be a relatable analogy. Be creative and educational.
+      - For energy, compare it to something understandable, like "The energy released is equivalent to X atomic bombs."
+      - For crater size, compare it to a landmark, like "A crater this size could fit the entire city of Y inside." or "If this crater were a mountain, it would be the Nth tallest in the world."
+      - For blast radius, compare it to a known geographical area.
+      Pick the most impactful and easily understood analogy.
+  2.  A summary of the estimated damage, considering population density, infrastructure, and environmental factors. Include potential effects like seismic activity, air blast, and thermal radiation.
+  3.  An estimated crater diameter in kilometers.
   4.  A risk level: 'Low', 'Moderate', 'High', or 'Catastrophic'.
   5.  An icon that best represents the scale of the event: 'Mountain' for huge geological impact, 'Building2' for city-level damage, 'Landmark' for a significant but localized event, or 'Bomb' for immense energy release.
   `,
