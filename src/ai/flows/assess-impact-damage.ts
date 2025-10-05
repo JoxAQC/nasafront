@@ -36,7 +36,7 @@ const AssessImpactDamageOutputSchema = z.object({
   funFact: z
     .string()
     .describe(
-      'An interesting and educational fact that contextualizes the impact\'s scale. It must provide a relatable comparison for the impact energy (e.g., "equivalent to X atomic bombs"), the crater diameter (e.g., "could fit the entire city of Y inside"), or the blast radius.'
+      'A multi-line string with interesting and educational facts that contextualize the impact\'s scale, separated by newlines. It must provide relatable comparisons for: 1. Impact Energy (e.g., "equivalent to X atomic bombs"), 2. Crater Diameter (e.g., "could fit the entire city of Y inside"), and 3. Blast Radius (e.g., "would flatten an area the size of Z"). Each fact should be on its own line.'
     ),
   craterDiameterKm: z
     .number()
@@ -77,10 +77,10 @@ const assessImpactDamagePrompt = ai.definePrompt({
   - Frame your summary in terms of potential effects and risks, not certainties.
 
   Your response must include:
-  1.  A "fun fact" to contextualize the scale of the impact. This fact MUST be a relatable analogy. Be creative and educational.
-      - For energy, compare it to something understandable, like "The energy released is equivalent to X Tsar Bomba explosions."
-      - For crater size, compare it to a landmark, like "A crater this size could fit the entire city of Y inside."
-      Pick the most impactful and easily understood analogy.
+  1.  A "fun fact" to contextualize the scale of the impact. This fact MUST be a multi-line string, with each point on a new line. It must provide relatable analogies for the following three aspects:
+      - Impact Energy: Compare it to something understandable, like "The energy released is equivalent to X Tsar Bomba explosions."
+      - Crater Diameter: Compare it to a landmark, like "A crater this size could fit the entire city of Y inside."
+      - Blast Radius: Compare it to a known geographical area, like "The blast would flatten an area comparable to the state of Rhode Island."
   2.  A summary of the estimated damage. Follow the critical guidelines above. Mention potential effects like seismic activity, air blast, and thermal radiation in a qualitative or conditional manner.
   3.  An estimated crater diameter in kilometers.
   4.  A risk level: 'Low', 'Moderate', 'High', or 'Catastrophic'.

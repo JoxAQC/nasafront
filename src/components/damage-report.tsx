@@ -23,20 +23,6 @@ const iconMap: { [key: string]: React.ElementType } = {
   Bomb: Bomb,
 };
 
-const TooltipContentWrapper = ({ title, text, children }: { title: string; text: string; children: React.ReactNode }) => (
-    <Tooltip>
-        <TooltipTrigger asChild>
-            {children}
-        </TooltipTrigger>
-        <TooltipContent>
-            <div className="max-w-xs text-center">
-                <p className="font-bold text-base">{title}</p>
-                <p className="text-sm text-muted-foreground">{text}</p>
-            </div>
-        </TooltipContent>
-    </Tooltip>
-);
-
 export function DamageReport({ report }: { report: Report }) {
   const IconComponent = iconMap[report.icon] || Scale;
 
@@ -112,9 +98,17 @@ export function DamageReport({ report }: { report: Report }) {
                                 <TableCell className="font-medium flex items-center gap-2 p-2">
                                     <item.icon className="w-4 h-4 text-primary shrink-0" />
                                     <span>{item.label}</span>
-                                     <TooltipContentWrapper title={item.tooltip.title} text={item.tooltip.text}>
-                                        <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                                    </TooltipContentWrapper>
+                                     <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <div className="max-w-xs text-center">
+                                                <p className="font-bold text-base">{item.tooltip.title}</p>
+                                                <p className="text-sm text-muted-foreground">{item.tooltip.text}</p>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </TableCell>
                                 <TableCell className="text-right p-2 text-muted-foreground">{item.value}</TableCell>
                             </TableRow>
@@ -134,7 +128,7 @@ export function DamageReport({ report }: { report: Report }) {
             <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold">Contextual Fact</h4>
-              <p className="text-muted-foreground">{report.funFact}</p>
+              <p className="text-muted-foreground whitespace-pre-line">{report.funFact}</p>
             </div>
           </div>
            <div className="flex items-start gap-3">
