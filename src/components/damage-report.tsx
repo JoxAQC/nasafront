@@ -55,7 +55,7 @@ export function DamageReport({ report }: { report: Report }) {
       icon: Atom,
       label: "Impact Energy",
       value: `${report.simulation.Ek_megatons} MT`,
-      tooltip: { title: "Kinetic Energy Released", text: "One megaton (MT) is the energy of one million tons of TNT. For context, the Tsar Bomba, the most powerful nuclear weapon ever detonated, had a yield of ~50 MT. The Tunguska event was ~15 MT." }
+      tooltip: { title: "Kinetic Energy Released", text: "One megaton (MT) is the energy of one million tons of TNT. For context, the Tunguska event was ~15 MT and the Tsar Bomba, the most powerful nuclear weapon ever detonated, had a yield of ~50 MT." }
     },
     {
       icon: AlertTriangle,
@@ -75,7 +75,7 @@ export function DamageReport({ report }: { report: Report }) {
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
         <CardTitle>Impact Report</CardTitle>
-        <CardDescription>Simulation &amp; AI-Generated Analysis</CardDescription>
+        <CardDescription>Simulation & AI-Generated Analysis</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center p-4 bg-muted/30 rounded-lg">
@@ -129,13 +129,6 @@ export function DamageReport({ report }: { report: Report }) {
             <div>
               <h4 className="font-semibold">Contextual Fact</h4>
               <p className="text-muted-foreground whitespace-pre-line">{report.funFact}</p>
-            </div>
-          </div>
-           <div className="flex items-start gap-3">
-            <Diameter className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-semibold">AI Est. Crater Diameter</h4>
-              <p className="text-muted-foreground">{report.craterDiameterKm.toLocaleString()} km</p>
             </div>
           </div>
         </div>
