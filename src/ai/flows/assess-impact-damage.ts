@@ -49,7 +49,7 @@ const AssessImpactDamageOutputSchema = z.object({
   icon: z
     .enum(['Mountain', 'Building2', 'Landmark', 'Bomb'])
     .describe(
-      'An icon name representing the scale of the impact. Options: Mountain, Building2, Landmark, Bomb.'
+      "An icon name representing the scale of the impact. Options: 'Mountain' for huge geological scale, 'Building2' for city-level, 'Landmark' for significant but local, 'Bomb' for immense energy."
     ),
     mitigationStrategies: z
     .array(z.string())

@@ -16,7 +16,7 @@ export function ImpactAnimation({ x, y }: { x: number; y: number; }) {
           style={{ width: 400, height: 400, transform: 'translate(-50%, -50%)' }}
         />
         <div
-          className="absolute w-12 h-12 bg-black rounded-full border border-gray-500 animate-crater-appear"
+          className="absolute w-12 h-12 bg-red-600 rounded-full border border-red-800 animate-crater-appear"
           style={{ transform: 'translate(-50%, -50%)' }}
         />
       </div>

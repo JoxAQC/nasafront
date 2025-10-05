@@ -166,7 +166,7 @@ export default function SimulatorPage() {
         {report && !isBusy && <div className="animate-fade-in-up"><DamageReport report={report} /></div>}
       </div>
       <div className="relative h-full w-full">
-        <MapView onLocationSelect={handleLocationSelect} selectedLocation={impactLocation} />
+        <MapView onLocationSelect={handleLocationSelect} selectedLocation={impactLocation} isImpacting={showImpact} />
         {showImpact && impactPixel && <ImpactAnimation x={impactPixel.x} y={impactPixel.y} />}
          {!impactLocation && (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/50">

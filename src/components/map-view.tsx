@@ -9,6 +9,7 @@ import type { Coordinates } from '@/app/simulator/page';
 type MapViewProps = {
   onLocationSelect: (coords: Coordinates, pixel: {x: number, y: number}) => void;
   selectedLocation: Coordinates | null;
+  isImpacting: boolean;
 };
 
 const containerStyle = {
@@ -35,7 +36,7 @@ const mapOptions = {
 };
 
 
-export function MapView({ onLocationSelect, selectedLocation }: MapViewProps) {
+export function MapView({ onLocationSelect, selectedLocation, isImpacting }: MapViewProps) {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
     libraries: ['geometry', 'drawing'],
@@ -82,7 +83,10 @@ export function MapView({ onLocationSelect, selectedLocation }: MapViewProps) {
   }
 
   return (
-    <div className="relative w-full h-full cursor-crosshair">
+    <div className={cn(
+        "relative w-full h-full cursor-crosshair",
+        isImpacting && "animate-map-shake"
+    )} style={{ animationDuration: '0.5s' }}>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
