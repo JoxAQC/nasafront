@@ -77,6 +77,16 @@ export function DamageReport({ report }: { report: Report }) {
     },
   ];
 
+  function getRiskImage(riskLevel: string) {
+    if (riskLevel === 'Low' || riskLevel === 'Moderate') {
+      return '/chill.png';
+    }
+    if (riskLevel === 'High' || riskLevel === 'Catastrophic') {
+      return '/risk.png';
+    }
+    return '/chill.png'; // default
+  }
+
   return (
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
@@ -85,7 +95,11 @@ export function DamageReport({ report }: { report: Report }) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center text-center p-4 bg-muted/30 rounded-lg">
-          <IconComponent className="w-16 h-16 mb-4 text-primary" strokeWidth={1} />
+          <img
+            src={getRiskImage(report.riskLevel)}
+            alt={report.riskLevel + ' risk'}
+            className="w-30 h-30 mb-4"
+          />
           <Badge
             variant="outline"
             className={`text-lg font-bold px-4 py-1 rounded-full ${riskLevelStyles[report.riskLevel] || ''}`}

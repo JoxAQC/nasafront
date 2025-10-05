@@ -6,12 +6,17 @@ import { Rocket } from 'lucide-react';
 
 export default function WelcomePage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
-      <div className="flex flex-col items-center gap-8 animate-fade-in-up">
-        <h1 className="text-8xl font-bold text-primary tracking-tighter">
+    <div
+      className="flex flex-col items-center justify-center h-screen text-foreground bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: "url('/fondo.png')",
+      }}
+    >
+      <div className="flex flex-col items-center gap-8 animate-fade-in-up bg-black/50 p-10 rounded-2xl backdrop-blur-sm">
+        <h1 className="text-8xl font-bold text-primary tracking-tighter drop-shadow-lg">
           NeoSentinel
         </h1>
-        <p className="text-lg text-muted-foreground -mt-4">
+        <p className="text-lg text-muted-foreground -mt-4 text-white drop-shadow">
           AI-Powered Meteorite Impact Simulation
         </p>
         <Link href="/simulator">

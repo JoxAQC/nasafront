@@ -77,7 +77,7 @@ export function ContextualChatbot({ messages, setMessages }: ChatbotProps) {
     <Card className="flex flex-col flex-grow">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bot />
+          <img src="/Neo.png" alt="Neo" className="w-20 h-20 rounded-full" />
           Ask Neo
         </CardTitle>
         <CardDescription>

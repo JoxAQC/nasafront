@@ -1,4 +1,4 @@
-# **App Name**: Terra Impact
+# **App Name**: NeoSentinel
 
 ## Core Features:
 
