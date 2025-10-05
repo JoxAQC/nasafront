@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getImpactAssessment } from '@/app/actions';
+import { getImpactAssessment, getChatbotResponse } from '@/app/actions';
 import { ImpactForm, type ImpactFormData } from '@/components/impact-form';
 import { DamageReport } from '@/components/damage-report';
 import { ImpactAnimation } from '@/components/impact-animation';
@@ -12,6 +12,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import { asteroids, type Asteroid } from '@/lib/asteroid-data';
 import { calculateImpactMetrics } from '@/lib/impact-calculator';
+import { AsteroidStats } from '@/components/asteroid-stats';
+import { ContextualChatbot } from '@/components/contextual-chatbot';
 
 
 export type Coordinates = {
@@ -113,7 +115,7 @@ export default function SimulatorPage() {
   };
 
   return (
-    <main className="grid h-screen w-screen grid-cols-1 md:grid-cols-[400px_1fr]">
+    <main className="grid h-screen w-screen grid-cols-1 md:grid-cols-[400px_1fr_350px]">
       <div className="z-10 flex h-full flex-col gap-4 overflow-y-auto bg-background p-4">
         <h1 className="text-2xl font-bold text-primary">NeoSentinel</h1>
         <ImpactForm
@@ -145,6 +147,11 @@ export default function SimulatorPage() {
           </div>
         )}
       </div>
+      <aside className="z-10 flex h-full flex-col gap-4 overflow-y-auto bg-background/70 p-4 backdrop-blur-sm">
+        <AsteroidStats />
+        <Separator />
+        <ContextualChatbot />
+      </aside>
     </main>
   );
 }

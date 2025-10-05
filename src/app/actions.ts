@@ -1,9 +1,10 @@
 'use server';
 
 import { assessImpactDamage, AssessImpactDamageInput } from '@/ai/flows/assess-impact-damage';
+import { contextualChat } from '@/ai/flows/contextual-chat';
 import { z } from 'zod';
 
-const actionSchema = z.object({
+const impactActionSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   meteoriteSizeInKilograms: z.number(),
@@ -12,7 +13,7 @@ const actionSchema = z.object({
 
 export async function getImpactAssessment(input: AssessImpactDamageInput) {
   try {
-    const validatedInput = actionSchema.parse(input);
+    const validatedInput = impactActionSchema.parse(input);
     const result = await assessImpactDamage(validatedInput);
     return { success: true, data: result };
   } catch (error) {
@@ -22,4 +23,26 @@ export async function getImpactAssessment(input: AssessImpactDamageInput) {
     }
     return { success: false, error: 'The AI model failed to assess damage. Please try again.' };
   }
+}
+
+const chatActionSchema = z.object({
+    history: z.array(z.object({
+        role: z.enum(['user', 'model']),
+        content: z.string(),
+    })),
+    message: z.string(),
+});
+
+export async function getChatbotResponse(input: z.infer<typeof chatActionSchema>) {
+    try {
+        const validatedInput = chatActionSchema.parse(input);
+        const result = await contextualChat(validatedInput);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error(error);
+        if (error instanceof z.ZodError) {
+            return { success: false, error: 'Invalid chat input.' };
+        }
+        return { success: false, error: 'The AI model failed to respond. Please try again.' };
+    }
 }

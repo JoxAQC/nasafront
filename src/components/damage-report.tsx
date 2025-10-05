@@ -103,7 +103,7 @@ export function DamageReport({ report }: { report: Report }) {
                                             <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <div className="max-w-xs text-center">
+                                            <div className="max-w-xs text-center p-2">
                                                 <p className="font-bold text-base">{item.tooltip.title}</p>
                                                 <p className="text-sm text-muted-foreground">{item.tooltip.text}</p>
                                             </div>
