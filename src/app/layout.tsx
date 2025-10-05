@@ -21,7 +21,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/neo.png" type="image/png" />
+        <link rel="icon" href="/icon.png" type="image/png" />
       </head>
       <body className="font-body antialiased">
         {children}
