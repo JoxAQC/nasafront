@@ -14,6 +14,7 @@ import { asteroids, type Asteroid } from '@/lib/asteroid-data';
 import { calculateImpactMetrics } from '@/lib/impact-calculator';
 import { AsteroidStats } from '@/components/asteroid-stats';
 import { ContextualChatbot } from '@/components/contextual-chatbot';
+import { Separator } from '@/components/ui/separator';
 
 
 export type Coordinates = {
