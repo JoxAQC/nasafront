@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Dispatch, SetStateAction } from 'react';
 import { Bot, Send, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
@@ -9,27 +9,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-type Message = {
+export type Message = {
   role: 'user' | 'model';
   content: string;
 };
 
-export function ContextualChatbot() {
-  const [messages, setMessages] = useState<Message[]>([]);
+type ChatbotProps = {
+    messages: Message[];
+    setMessages: Dispatch<SetStateAction<Message[]>>;
+};
+
+export function ContextualChatbot({ messages, setMessages }: ChatbotProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Add initial greeting if messages are empty
+    if (messages.length === 0) {
+      setMessages([
+        {
+          role: 'model',
+          content: "Hi! I'm Neo. Ask me anything about asteroids or click on the map to start a simulation.",
+        },
+      ]);
+    }
+  }, [messages.length, setMessages]);
+
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
     const result = await getChatbotResponse({
-      history: messages,
+      history: messages, // send history *before* the new user message
       message: input,
     });
 

@@ -13,7 +13,7 @@ import { Terminal } from 'lucide-react';
 import { asteroids, type Asteroid } from '@/lib/asteroid-data';
 import { calculateImpactMetrics } from '@/lib/impact-calculator';
 import { AsteroidStats } from '@/components/asteroid-stats';
-import { ContextualChatbot } from '@/components/contextual-chatbot';
+import { ContextualChatbot, type Message } from '@/components/contextual-chatbot';
 import { Separator } from '@/components/ui/separator';
 
 
@@ -43,6 +43,7 @@ export default function SimulatorPage() {
   const [error, setError] = useState<string | null>(null);
   const [showImpact, setShowImpact] = useState(false);
   const [impactPixel, setImpactPixel] = useState<{x: number, y: number} | null>(null);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const { toast } = useToast();
 
   const handleLocationSelect = (coords: Coordinates, pixel?: {x: number, y: number}) => {
@@ -51,6 +52,10 @@ export default function SimulatorPage() {
     if(pixel) setImpactPixel(pixel);
     setReport(null);
     setError(null);
+  };
+  
+  const addBotMessageToChat = (content: string) => {
+    setChatMessages(prev => [...prev, { role: 'model', content }]);
   };
 
   const handleSimulate = async (data: ImpactFormData) => {
@@ -78,6 +83,15 @@ export default function SimulatorPage() {
     setReport(null);
     setShowImpact(true);
 
+    // Get fun fact about asteroid
+    const funFactResponse = await getChatbotResponse({
+      history: chatMessages,
+      appContext: { type: 'simulationStart', data: selectedAsteroid }
+    });
+    if (funFactResponse.success && funFactResponse.data) {
+      addBotMessageToChat(funFactResponse.data);
+    }
+
     const simulationResults = calculateImpactMetrics(selectedAsteroid.H);
     
     const input = {
@@ -90,11 +104,22 @@ export default function SimulatorPage() {
     const result = await getImpactAssessment(input);
 
     if (result.success && result.data) {
-      setReport({ 
+      const newReport = { 
         ...result.data,
         simulation: simulationResults,
         asteroid: selectedAsteroid
+      };
+      setReport(newReport);
+
+      // Get reaction to report
+       const reactionResponse = await getChatbotResponse({
+        history: chatMessages,
+        appContext: { type: 'reportGenerated', data: result.data }
       });
+      if (reactionResponse.success && reactionResponse.data) {
+        addBotMessageToChat(reactionResponse.data);
+      }
+
     } else {
       setError(result.error || 'An unknown error occurred.');
       toast({
@@ -118,6 +143,7 @@ export default function SimulatorPage() {
     setIsBusy(false);
     setShowImpact(false);
     setImpactPixel(null);
+    setChatMessages([]);
   };
 
   return (
@@ -156,7 +182,7 @@ export default function SimulatorPage() {
       <aside className="z-10 flex h-full flex-col gap-4 overflow-y-auto bg-background/70 p-4 backdrop-blur-sm">
         <AsteroidStats />
         <Separator />
-        <ContextualChatbot />
+        <ContextualChatbot messages={chatMessages} setMessages={setChatMessages} />
       </aside>
     </main>
   );

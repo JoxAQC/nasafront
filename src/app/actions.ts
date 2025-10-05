@@ -1,7 +1,8 @@
 'use server';
 
-import { assessImpactDamage, AssessImpactDamageInput } from '@/ai/flows/assess-impact-damage';
+import { assessImpactDamage, AssessImpactDamageInput, AssessImpactDamageOutput } from '@/ai/flows/assess-impact-damage';
 import { contextualChat } from '@/ai/flows/contextual-chat';
+import { Asteroid } from '@/lib/asteroid-data';
 import { z } from 'zod';
 
 const impactActionSchema = z.object({
@@ -25,13 +26,23 @@ export async function getImpactAssessment(input: AssessImpactDamageInput) {
   }
 }
 
-const chatActionSchema = z.object({
-    history: z.array(z.object({
-        role: z.enum(['user', 'model']),
-        content: z.string(),
-    })),
-    message: z.string(),
+const chatHistorySchema = z.object({
+    role: z.enum(['user', 'model']),
+    content: z.string(),
 });
+
+const appContextSchema = z.object({
+    type: z.enum(['simulationStart', 'reportGenerated']),
+    data: z.any(),
+});
+
+
+const chatActionSchema = z.object({
+    history: z.array(chatHistorySchema),
+    message: z.string().optional(),
+    appContext: appContextSchema.optional(),
+});
+
 
 export async function getChatbotResponse(input: z.infer<typeof chatActionSchema>) {
     try {

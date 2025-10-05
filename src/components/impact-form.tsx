@@ -15,8 +15,8 @@ import { useEffect } from 'react';
 
 const formSchema = z.object({
   asteroidName: z.string().min(1, 'Please select an asteroid.'),
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number().refine(val => !isNaN(val), { message: "Latitude is required." }),
+  longitude: z.number().refine(val => !isNaN(val), { message: "Longitude is required." }),
 });
 
 export type ImpactFormData = z.infer<typeof formSchema>;
@@ -42,12 +42,22 @@ export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: Impa
     if (impactLocation) {
       form.setValue('latitude', impactLocation.lat);
       form.setValue('longitude', impactLocation.lng);
+      form.clearErrors('latitude');
+      form.clearErrors('longitude');
+    } else {
+        form.setValue('latitude', NaN);
+        form.setValue('longitude', NaN);
     }
   }, [impactLocation, form]);
 
   const onSubmit = (data: ImpactFormData) => {
     onSimulate(data);
   };
+  
+  const handleReset = () => {
+    form.reset();
+    onReset();
+  }
 
   return (
     <div className="space-y-6">
@@ -93,13 +103,13 @@ export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: Impa
                       <FormControl>
                          <Input 
                             {...field} 
-                            value={field.value || ''}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                            type="number"
-                            disabled={isBusy} 
+                            value={!isNaN(field.value) ? field.value : ''}
+                            readOnly
+                            disabled
                             placeholder="Select on map"
                          />
                       </FormControl>
+                       <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -112,13 +122,13 @@ export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: Impa
                       <FormControl>
                          <Input 
                             {...field} 
-                            value={field.value || ''}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                            type="number"
-                            disabled={isBusy} 
+                            value={!isNaN(field.value) ? field.value : ''}
+                            readOnly
+                            disabled 
                             placeholder="Select on map"
                          />
                       </FormControl>
+                       <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -129,7 +139,7 @@ export function ImpactForm({ onSimulate, onReset, isBusy, impactLocation }: Impa
                   <Rocket />
                   {isBusy ? 'Simulating...' : 'Simulate Impact'}
                 </Button>
-                <Button variant="outline" type="button" onClick={onReset} disabled={isBusy}>
+                <Button variant="outline" type="button" onClick={handleReset} disabled={isBusy}>
                   <RotateCcw />
                   Reset
                 </Button>
